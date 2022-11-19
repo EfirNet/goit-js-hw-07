@@ -10,6 +10,50 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-console.log(galleryItems);
+const galleryContainer = document.querySelector('.gallery');
+const blockMarkup = createImagesGallery(galleryItems);
+galleryContainer.insertAdjacentHTML("afterbegin", blockMarkup);
+galleryContainer.addEventListener('click', onGalleryContainerClick);
 
+function createImagesGallery(items) {
+  return items.map(({preview, original, description}) =>
+  `<div class="gallery__item">
+  <a class="gallery__link" href="${original}">
+    <img
+      class="gallery__image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+</div>`).join('');
+};
+
+function onGalleryContainerClick(evt) {
+evt.preventDefault();
+if (evt.target.nodeName !== 'IMG') {
+  return;
+}
+
+const instance = basicLightbox.create(
+  `<img src="${evt.target.dataset.source}">`,
+  {
+    onShow: function () {
+      window.addEventListener("keydown", checkKeyEvent)
+    },
+    onClose: function () {
+      window.removeEventListener("keydown", checkKeyEvent)
+    }
+  }
+)
+  
+instance.show()
+
+function checkKeyEvent (evt) {
+  console.log(evt.code)
+  if (evt.code === "Escape") {
+    instance.close();
+  }
+}
+}
 
